@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 type Invoke struct {
@@ -69,25 +70,52 @@ func (i *Invoke) initChat() error {
 
 	// response
 	var resp ChatResponse
-	contentBuffer := bytes.NewBufferString("")
-	lines := bytes.Split(i.ResponseBody, []byte{'\n'})
-	for _, line := range lines {
-		if len(line) == 0 {
-			continue
+	lines := strings.Split(string(i.ResponseBody), "\n")
+	if len(lines) > 1 {
+		// streaming response
+		contentBuffer := bytes.NewBufferString("")
+		thinkingBuffer := bytes.NewBufferString("")
+		var toolCalls []ChatToolCall = nil
+
+		appendChunk := func(chunk *ChatResponse) {
+			if chunk.Message.Content != "" {
+				contentBuffer.WriteString(chunk.Message.Content)
+			}
+			if chunk.Message.Thinking != "" {
+				thinkingBuffer.WriteString(chunk.Message.Thinking)
+			}
+			if len(chunk.Message.ToolCalls) > 0 {
+				toolCalls = append(toolCalls, chunk.Message.ToolCalls...)
+			}
 		}
-		var resp0 ChatResponse
-		if err := json.Unmarshal(line, &resp0); err != nil {
+
+		for _, chunkLine := range lines {
+			if len(chunkLine) == 0 {
+				continue
+			}
+			var chunk ChatResponse
+			if err := json.Unmarshal([]byte(chunkLine), &chunk); err != nil {
+				return err
+			}
+			if !chunk.Done {
+				appendChunk(&chunk)
+			} else {
+				appendChunk(&chunk)
+				resp = chunk
+				resp.Message.Content = contentBuffer.String()
+				resp.Message.Thinking = thinkingBuffer.String()
+				resp.Message.ToolCalls = toolCalls
+				break
+			}
+		}
+		i.Chat.Response = &resp
+	} else {
+		// non-streaming response
+		if err := json.Unmarshal(i.ResponseBody, &resp); err != nil {
 			return err
 		}
-		if !resp0.Done {
-			contentBuffer.WriteString(resp0.Message.Content)
-		} else {
-			resp = resp0
-			resp.Message.Content = contentBuffer.String()
-			break
-		}
+		i.Chat.Response = &resp
 	}
-	i.Chat.Response = &resp
 	return nil
 }
 
