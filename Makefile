@@ -2,12 +2,12 @@
 
 .PHONY: build
 build:
-	@go build -o dist/ollamao
+	@bun run build && go build -o dist/ollamao
 
 
 .PHONY: clean
 clean:
-	@rm -rf dist
+	@rm -rf dist && rm -rf ui/dist
 
 
 .PHONY: cloc

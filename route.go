@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httputil"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,26 +18,27 @@ var recordableAPIs = []string{
 	"/api/chat",
 }
 
-func handleProxy(c *gin.Context) {
-	reqPath := c.Request.URL.Path
-	switch reqPath {
-	case "/api/observer/all":
+func route(c *gin.Context) {
+	reqPath := c.Param("any")
+	if reqPath == "/api/observer/all" {
 		apiObserverAll(c)
 		return
-	case "/api/observer/ids":
+	} else if reqPath == "/api/observer/ids" {
 		apiObserverIds(c)
 		return
-	case "/api/observer/get":
+	} else if reqPath == "/api/observer/get" {
 		apiObserverGet(c)
 		return
-	default:
-		if lo.Contains(recordableAPIs, reqPath) {
-			proxyRecordable(c)
-		} else {
-			proxyTransparent(c)
-		}
+	} else if strings.HasPrefix(reqPath, "/o") {
+		observerUI(c)
+		return
+	} else if lo.Contains(recordableAPIs, reqPath) {
+		proxyRecordable(c)
+		return
+	} else {
+		proxyTransparent(c)
+		return
 	}
-
 }
 
 func proxyRecordable(c *gin.Context) {

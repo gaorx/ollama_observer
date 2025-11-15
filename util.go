@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"mime"
+	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -51,7 +52,6 @@ func getRequestArgs(c *gin.Context) map[string]any {
 		}
 		readQueryToArgs()
 	}
-	fmt.Println("******", args)
 	return args
 }
 
@@ -62,4 +62,20 @@ func getStringArg(args map[string]any, key string, defaultValue string) string {
 		}
 	}
 	return defaultValue
+}
+
+func getMimeFromFilename(filename string) string {
+	defaultMime := "application/octet-stream"
+	if filename == "" {
+		return defaultMime
+	}
+	ext := filepath.Ext(filename)
+	if ext == "" {
+		return defaultMime
+	}
+	mimeType := mime.TypeByExtension(ext)
+	if mimeType == "" {
+		return defaultMime
+	}
+	return mimeType
 }
