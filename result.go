@@ -8,7 +8,7 @@ type Result struct {
 
 func NewResultOK(data any) *Result {
 	return &Result{
-		Code: 200,
+		Code: 0,
 		Data: data,
 	}
 }

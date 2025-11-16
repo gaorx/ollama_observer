@@ -2,18 +2,40 @@ package main
 
 import (
 	"sync"
+
+	"github.com/samber/lo"
 )
 
 const maxInvokes = 100
 
 type Store struct {
-	mu      sync.RWMutex
-	invokes []*Invoke
+	mu        sync.RWMutex
+	invokes   []*Invoke
+	listeners map[string]func(string, *Invoke)
 }
 
 func NewStore() *Store {
 	return &Store{
 		invokes: make([]*Invoke, 0),
+	}
+}
+
+func (s *Store) AddListener(fn func(string, *Invoke)) string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.listeners == nil {
+		s.listeners = make(map[string]func(string, *Invoke))
+	}
+	listenerId := lo.RandomString(10, lo.AlphanumericCharset)
+	s.listeners[listenerId] = fn
+	return listenerId
+}
+
+func (s *Store) RemoveListener(id string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.listeners != nil {
+		delete(s.listeners, id)
 	}
 }
 
@@ -30,6 +52,9 @@ func (s *Store) Add(i *Invoke) {
 	}
 
 	s.invokes = append(s.invokes, i)
+	for _, fn := range s.listeners {
+		fn("add", i)
+	}
 }
 
 func (s *Store) Count() int {

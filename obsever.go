@@ -1,6 +1,9 @@
 package main
 
 import (
+	"encoding/json"
+	"io"
+
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
 )
@@ -34,4 +37,26 @@ func apiObserverGet(c *gin.Context) {
 		return
 	}
 	c.JSON(200, NewResultOK(NewInvokeResponse(i)))
+}
+
+func apiObserverPull(c *gin.Context) {
+	eventChan := make(chan *Invoke)
+	listenerId := store.AddListener(func(typ string, i *Invoke) {
+		if typ == "add" {
+			eventChan <- i
+		}
+	})
+	defer func() {
+		store.RemoveListener(listenerId)
+		close(eventChan)
+	}()
+	c.Stream(func(w io.Writer) bool {
+		if i, ok := <-eventChan; ok {
+			j, err := json.Marshal(map[string]string{"id": i.ID})
+			if err == nil {
+				c.SSEvent("message", string(j))
+			}
+		}
+		return true
+	})
 }

@@ -1,20 +1,45 @@
-import { Button, Splitter } from 'antd';
+import { ReactNode, useEffect } from 'react';
+import { Input, Splitter, Flex } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import Toolbar from './Toolbar';
+import InvokeList from './InvokeList';
+import InvokeDetail from './InvokeDetail';
+import { useInvokeStore } from './store';
 
-const defaultPadding = 16;
+function App(): ReactNode {
+  const invokeStore = useInvokeStore();
 
-function App() {
+  useEffect(() => {
+    (async () => {
+      await invokeStore.fetchAll();
+    })();
+    invokeStore.startPull();
+  }, []);
+
   return (
-    <Splitter style={{ minHeight: '100vh' }}>
+    <Splitter style={{ height: '100vh' }}>
       <Splitter.Panel
         defaultSize="25%"
         min="20%"
         max="50%"
-        style={{ padding: defaultPadding }}
+        style={{ padding: '24px 28px' }}
       >
-        <h1>Ollama Observer</h1>
+        <Flex
+          style={{ height: '100%' }}
+          gap={24}
+          vertical
+        >
+          <Toolbar />
+          <Input
+            placeholder="Search in invokes"
+            prefix={<SearchOutlined />}
+            style={{ borderRadius: 16, paddingBlock: 10 }}
+          />
+          <InvokeList style={{ flexGrow: 1 }} />
+        </Flex>
       </Splitter.Panel>
-      <Splitter.Panel style={{ padding: defaultPadding }}>
-        <Button type="primary">Click Me</Button>
+      <Splitter.Panel style={{ padding: '24px 28px' }}>
+        <InvokeDetail />
       </Splitter.Panel>
     </Splitter>
   );

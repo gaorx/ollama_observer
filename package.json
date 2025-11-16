@@ -7,9 +7,14 @@
     "build": "bun run ./build_ui.ts"
   },
   "dependencies": {
+    "@ant-design/icons": "5.x",
+    "@emotion/css": "^11.13.5",
+    "@emotion/react": "^11.14.0",
     "antd": "^5.28.1",
+    "ollama": "^0.6.3",
     "react": "^19",
-    "react-dom": "^19"
+    "react-dom": "^19",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@types/react": "^19",

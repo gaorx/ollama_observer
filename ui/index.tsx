@@ -9,6 +9,9 @@ root.render(
   <React.StrictMode>
     <ConfigProvider
       theme={{
+        token: {
+          fontSize: 16,
+        },
         components: {
           Layout: {
             siderBg: '#ffffff',

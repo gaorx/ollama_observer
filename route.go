@@ -29,7 +29,10 @@ func route(c *gin.Context) {
 	} else if reqPath == "/api/observer/get" {
 		apiObserverGet(c)
 		return
-	} else if strings.HasPrefix(reqPath, "/o") {
+	} else if reqPath == "/api/observer/pull" {
+		apiObserverPull(c)
+		return
+	} else if reqPath == "/o" || strings.HasPrefix(reqPath, "/o/") {
 		observerUI(c)
 		return
 	} else if lo.Contains(recordableAPIs, reqPath) {
