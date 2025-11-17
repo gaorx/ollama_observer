@@ -20,6 +20,10 @@ export async function getInvokeByID(id: string): Promise<Invoke> {
   return await call('/api/observer/get', { id: id });
 }
 
+export async function clearInvokes(): Promise<void> {
+  await call('/api/observer/clear', {});
+}
+
 async function call(path: string, args: Record<string, any>): Promise<any> {
   const resp = await fetch(path, {
     method: 'POST',

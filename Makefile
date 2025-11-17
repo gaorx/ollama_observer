@@ -12,4 +12,4 @@ clean:
 
 .PHONY: cloc
 cloc:
-	@cloc . --exclude-dir=dist,.git,.idea,.vscode
+	@cloc . --exclude-dir=dist,.git,.idea,.vscode,node_modules

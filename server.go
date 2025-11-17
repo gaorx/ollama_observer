@@ -52,7 +52,8 @@ func serverMain(_ context.Context, cmd *cli.Command) error {
 	app.Use(func(c *gin.Context) {
 		c.Set("config", config)
 	})
-	// Proxy all other requests
+
+	// Route all other requests
 	app.GET("/*any", route)
 	app.POST("/*any", route)
 	app.PUT("/*any", route)
@@ -60,7 +61,7 @@ func serverMain(_ context.Context, cmd *cli.Command) error {
 	app.PATCH("/*any", route)
 	app.HEAD("/*any", route)
 	app.OPTIONS("/*any", route)
-	fmt.Printf("Ollama proxy server is running on %d, remote is %s\n", config.Port, config.Remote)
+	fmt.Printf("Ollama observer is running on %d, remote is %s\n", config.Port, config.Remote)
 	return app.Run(fmt.Sprintf(":%d", config.Port))
 }
 

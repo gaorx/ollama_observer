@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type Invoke struct {
 	ID             string
-	At             int64
+	At             time.Time
 	Method         string
 	Path           string
 	RequestHeader  http.Header
@@ -27,7 +28,7 @@ type Invoke struct {
 
 type InvokeResponse struct {
 	ID             string            `json:"id"`
-	At             string            `json:"at"`
+	At             time.Time         `json:"at"`
 	Method         string            `json:"method"`
 	Path           string            `json:"path"`
 	Status         int               `json:"status"`
@@ -122,7 +123,7 @@ func (i *Invoke) initChat() error {
 func NewInvokeResponse(i *Invoke) *InvokeResponse {
 	return &InvokeResponse{
 		ID:             i.ID,
-		At:             fromTimestamp(i.At).Format("200"),
+		At:             i.At.UTC(),
 		Method:         i.Method,
 		Path:           i.Path,
 		Status:         i.ResponseStatus,

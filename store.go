@@ -11,7 +11,7 @@ const maxInvokes = 100
 type Store struct {
 	mu        sync.RWMutex
 	invokes   []*Invoke
-	listeners map[string]func(string, *Invoke)
+	listeners map[string]func(string, any)
 }
 
 func NewStore() *Store {
@@ -20,11 +20,11 @@ func NewStore() *Store {
 	}
 }
 
-func (s *Store) AddListener(fn func(string, *Invoke)) string {
+func (s *Store) AddListener(fn func(string, any)) string {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.listeners == nil {
-		s.listeners = make(map[string]func(string, *Invoke))
+		s.listeners = make(map[string]func(string, any))
 	}
 	listenerId := lo.RandomString(10, lo.AlphanumericCharset)
 	s.listeners[listenerId] = fn
@@ -37,6 +37,13 @@ func (s *Store) RemoveListener(id string) {
 	if s.listeners != nil {
 		delete(s.listeners, id)
 	}
+}
+
+func (s *Store) Clear() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.invokes = make([]*Invoke, 0)
+	s.fireEvent("clear", nil)
 }
 
 func (s *Store) Add(i *Invoke) {
@@ -52,9 +59,7 @@ func (s *Store) Add(i *Invoke) {
 	}
 
 	s.invokes = append(s.invokes, i)
-	for _, fn := range s.listeners {
-		fn("add", i)
-	}
+	s.fireEvent("add", i)
 }
 
 func (s *Store) Count() int {
@@ -104,4 +109,10 @@ func (s *Store) Latest() *Invoke {
 		return nil
 	}
 	return s.invokes[len(s.invokes)-1]
+}
+
+func (s *Store) fireEvent(typ string, data any) {
+	for _, fn := range s.listeners {
+		fn(typ, data)
+	}
 }

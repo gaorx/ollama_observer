@@ -39,11 +39,21 @@ func apiObserverGet(c *gin.Context) {
 	c.JSON(200, NewResultOK(NewInvokeResponse(i)))
 }
 
+func apiObserverClear(c *gin.Context) {
+	store.Clear()
+	c.JSON(200, NewResultOK(map[string]any{}))
+}
+
 func apiObserverPull(c *gin.Context) {
 	eventChan := make(chan *Invoke)
-	listenerId := store.AddListener(func(typ string, i *Invoke) {
+	listenerId := store.AddListener(func(typ string, data any) {
 		if typ == "add" {
-			eventChan <- i
+			if i, ok := data.(*Invoke); ok {
+				select {
+				case eventChan <- i:
+				default:
+				}
+			}
 		}
 	})
 	defer func() {

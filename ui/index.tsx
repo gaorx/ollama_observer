@@ -1,22 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme } from 'antd';
 import App from './App';
 import './index.css';
+import { getThemeId } from './theme';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+const themeId = getThemeId();
 root.render(
   <React.StrictMode>
     <ConfigProvider
       theme={{
+        algorithm: themeId === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
         token: {
           fontSize: 16,
-        },
-        components: {
-          Layout: {
-            siderBg: '#ffffff',
-            headerBg: '#ffffff',
-          },
+          borderRadius: 10,
+          colorPrimary: '#9149f7',
         },
       }}
     >

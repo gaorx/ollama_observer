@@ -10,9 +10,12 @@
     "@ant-design/icons": "5.x",
     "@emotion/css": "^11.13.5",
     "@emotion/react": "^11.14.0",
+    "@types/react-copy-to-clipboard": "^5.0.7",
     "antd": "^5.28.1",
+    "dayjs": "^1.11.19",
     "ollama": "^0.6.3",
     "react": "^19",
+    "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^19",
     "zustand": "^5.0.8"
   },
