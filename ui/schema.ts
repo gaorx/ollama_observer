@@ -2,6 +2,7 @@ import type { ChatRequest, ChatResponse } from 'ollama';
 
 export interface Invoke {
   id: string;
+  order: number;
   at: string;
   method: string;
   path: string;

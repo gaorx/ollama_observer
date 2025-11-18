@@ -23,7 +23,7 @@ function App(): ReactNode {
   return (
     <Splitter style={{ height: '100vh' }}>
       <Splitter.Panel
-        defaultSize="25%"
+        defaultSize="30%"
         min="20%"
         max="50%"
         style={{ padding: panelPadding, backgroundColor: themeToken.colorBgContainer }}
@@ -50,13 +50,15 @@ function App(): ReactNode {
               invokeStore.setSearchKeyword('');
             }}
           />
-          <InvokeList style={{ flexGrow: 1 }} />
+          <div style={{ flexGrow: 1, overflowY: 'auto', scrollbarWidth: 'thin', padding: 2 }}>
+            <InvokeList />
+          </div>
         </Flex>
       </Splitter.Panel>
       <Splitter.Panel
         style={{ padding: panelPadding, backgroundColor: themeToken.colorBgContainer }}
       >
-        <InvokeDetail />
+        <InvokeDetail style={{ width: '100%' }} />
       </Splitter.Panel>
     </Splitter>
   );

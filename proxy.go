@@ -29,6 +29,7 @@ func proxyRecordable(c *gin.Context) {
 	proxy.ServeHTTP(writer1, req1)
 	i := &Invoke{
 		ID:             lo.RandomString(8, lo.AlphanumericCharset),
+		Order:          store.GenerateOrder(),
 		At:             time.Now(),
 		Method:         req1.Method,
 		Path:           req1.URL.Path,

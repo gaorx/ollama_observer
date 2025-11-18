@@ -1,10 +1,9 @@
 import { CSSProperties, ReactNode } from 'react';
 import { css } from '@emotion/css';
 import { ReloadOutlined, ClearOutlined } from '@ant-design/icons';
-import { Flex, Button, Space, Tooltip, theme } from 'antd';
+import { Flex, Button, Space, Tooltip, Typography } from 'antd';
 import { useInvokeStore } from './store';
 import ollamaLogo from './ollama.png';
-import { useThemeToken } from './theme';
 
 export interface ToolbarProps {
   style?: CSSProperties;
@@ -39,6 +38,9 @@ export default function Toolbar(props?: ToolbarProps): ReactNode {
           style={{ maxWidth: '100%', maxHeight: '100%' }}
         />
       </div>
+      <Typography.Text style={{ fontSize: '1.2em', fontWeight: 'bolder' }}>
+        Observer
+      </Typography.Text>
       <Space>
         <Tooltip title="Reload invokes">
           <Button

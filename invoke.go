@@ -10,6 +10,7 @@ import (
 
 type Invoke struct {
 	ID             string
+	Order          int
 	At             time.Time
 	Method         string
 	Path           string
@@ -28,6 +29,7 @@ type Invoke struct {
 
 type InvokeResponse struct {
 	ID             string            `json:"id"`
+	Order          int               `json:"order"`
 	At             time.Time         `json:"at"`
 	Method         string            `json:"method"`
 	Path           string            `json:"path"`
@@ -123,6 +125,7 @@ func (i *Invoke) initChat() error {
 func NewInvokeResponse(i *Invoke) *InvokeResponse {
 	return &InvokeResponse{
 		ID:             i.ID,
+		Order:          i.Order,
 		At:             i.At.UTC(),
 		Method:         i.Method,
 		Path:           i.Path,

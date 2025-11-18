@@ -1,11 +1,10 @@
 import { ReactNode, CSSProperties } from 'react';
 import { css } from '@emotion/css';
 import { List, Card, Flex, Typography, Space, Button, message, Divider } from 'antd';
-import { CopyOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Message } from 'ollama';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Invoke, getInvokeRequestAsChatRequest } from './schema';
+import AttributeList from './Components/AttributeList';
 import { useInvokeStore } from './store';
 import { useThemeToken } from './theme';
 
@@ -26,7 +25,7 @@ export default function InvokeList(props?: InvokeListProps): ReactNode {
   );
 }
 
-const smallTextSize = '0.75em';
+const smallTextSize = '0.8em';
 const smallMargin = '4px';
 
 function InvokeItem(props: { invoke: Invoke }): ReactNode {
@@ -67,16 +66,8 @@ function InvokeItem(props: { invoke: Invoke }): ReactNode {
         align="center"
       >
         <Space>
-          <CopyToClipboard text={invoke.id}>
-            <Button
-              icon={<CopyOutlined />}
-              size="small"
-            />
-          </CopyToClipboard>
+          <Typography.Text type="secondary">{`#${invoke.order}`}</Typography.Text>
           <Typography.Text strong>{invoke.path}</Typography.Text>
-          <Typography.Text code>
-            {getInvokeRequestAsChatRequest(invoke).model || ''}
-          </Typography.Text>
         </Space>
         <Space>
           <Typography.Text type="secondary">{dayjs(invoke.at).format('HH:mm:ss')}</Typography.Text>
@@ -97,43 +88,24 @@ function renderRequest(invoke: Invoke): ReactNode {
 
 function renderRequestAsChat(invoke: Invoke): ReactNode {
   const requestMessages = getInvokeRequestAsChatRequest(invoke).messages || [];
+  const requestAttributes = requestMessages.map((msg) => {
+    return {
+      key: `${msg.role}:`,
+      value: normalizeMessageContent(msg),
+    };
+  });
   return (
     <>
-      {requestMessages.length > 0 && <Divider style={{ margin: `${smallMargin} 0 0 0` }} />}
-      <List
-        dataSource={requestMessages}
-        renderItem={(msg) => {
-          return (
-            <List.Item style={{ padding: smallMargin }}>
-              <Flex
-                gap={8}
-                style={{ width: '100%' }}
-              >
-                <Typography.Text
-                  strong
-                  style={{
-                    display: 'block',
-                    flexBasis: '20%',
-                    flexShrink: 0,
-                    flexGrow: 0,
-                    textAlign: 'right',
-                    fontSize: smallTextSize,
-                  }}
-                >
-                  {`${msg.role} :`}
-                </Typography.Text>
-                <Typography.Text
-                  type="secondary"
-                  ellipsis
-                  style={{ display: 'block', flexGrow: 1, flexBasis: 0, fontSize: smallTextSize }}
-                >
-                  {normalizeMessageContent(msg)}
-                </Typography.Text>
-              </Flex>
-            </List.Item>
-          );
-        }}
-      />
+      {requestAttributes.length > 0 && <Divider style={{ margin: `${smallMargin} 0 0 0` }} />}
+      {requestAttributes.length > 0 && (
+        <AttributeList
+          data={requestAttributes}
+          gap={8}
+          keyWidth="15%"
+          style={{ width: '100%' }}
+          defaultTextSize={smallTextSize}
+        />
+      )}
     </>
   );
 }

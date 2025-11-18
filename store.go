@@ -9,14 +9,16 @@ import (
 const maxInvokes = 100
 
 type Store struct {
-	mu        sync.RWMutex
-	invokes   []*Invoke
-	listeners map[string]func(string, any)
+	mu            sync.RWMutex
+	invokes       []*Invoke
+	listeners     map[string]func(string, any)
+	invokeCounter int
 }
 
 func NewStore() *Store {
 	return &Store{
-		invokes: make([]*Invoke, 0),
+		invokes:       make([]*Invoke, 0),
+		invokeCounter: 0,
 	}
 }
 
@@ -109,6 +111,13 @@ func (s *Store) Latest() *Invoke {
 		return nil
 	}
 	return s.invokes[len(s.invokes)-1]
+}
+
+func (s *Store) GenerateOrder() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.invokeCounter++
+	return s.invokeCounter
 }
 
 func (s *Store) fireEvent(typ string, data any) {
