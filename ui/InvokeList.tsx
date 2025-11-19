@@ -1,12 +1,11 @@
-import { ReactNode, CSSProperties } from 'react';
-import { css } from '@emotion/css';
-import { List, Card, Flex, Typography, Space, Button, message, Divider } from 'antd';
 import dayjs from 'dayjs';
 import { Message } from 'ollama';
-import { Invoke, getInvokeRequestAsChatRequest } from './schema';
+import { CSSProperties, ReactNode } from 'react';
+import { css } from '@emotion/css';
+import { Button, Card, Divider, Flex, List, Space, Typography, message, theme } from 'antd';
 import AttributeList from './Components/AttributeList';
+import { Invoke, getInvokeRequestAsChatRequest } from './schema';
 import { useInvokeStore } from './store';
-import { useThemeToken } from './theme';
 
 export interface InvokeListProps {
   style?: CSSProperties;
@@ -25,13 +24,13 @@ export default function InvokeList(props?: InvokeListProps): ReactNode {
   );
 }
 
-const smallTextSize = '0.8em';
+const smallTextSize = '0.9em';
 const smallMargin = '4px';
 
 function InvokeItem(props: { invoke: Invoke }): ReactNode {
   const { invoke } = props;
   const store = useInvokeStore();
-  const themeToken = useThemeToken();
+  const themeToken = theme.useToken().token;
   const isActivated = invoke.id === store.activitedId;
   //console.log('****', invoke);
 
@@ -67,10 +66,15 @@ function InvokeItem(props: { invoke: Invoke }): ReactNode {
       >
         <Space>
           <Typography.Text type="secondary">{`#${invoke.order}`}</Typography.Text>
-          <Typography.Text strong>{invoke.path}</Typography.Text>
+          <Typography.Text style={{ fontWeight: 'bolder' }}>{invoke.path}</Typography.Text>
         </Space>
         <Space>
-          <Typography.Text type="secondary">{dayjs(invoke.at).format('HH:mm:ss')}</Typography.Text>
+          <Typography.Text
+            type="secondary"
+            style={{ fontSize: smallTextSize }}
+          >
+            {dayjs(invoke.at).format('HH:mm:ss')}
+          </Typography.Text>
         </Space>
       </Flex>
       {renderRequest(invoke)}
@@ -101,8 +105,9 @@ function renderRequestAsChat(invoke: Invoke): ReactNode {
         <AttributeList
           data={requestAttributes}
           gap={8}
-          keyWidth="15%"
+          keyWidth="25%"
           style={{ width: '100%' }}
+          itemStyle={{ margin: smallMargin }}
           defaultTextSize={smallTextSize}
         />
       )}

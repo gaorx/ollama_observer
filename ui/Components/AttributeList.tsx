@@ -1,5 +1,5 @@
 import { CSSProperties, ReactNode } from 'react';
-import { Typography, List, Flex } from 'antd';
+import { Flex, List, Typography } from 'antd';
 
 export interface AttributeListProps {
   data: Array<{ key: ReactNode; value: ReactNode }>;
@@ -7,6 +7,7 @@ export interface AttributeListProps {
   gap?: number | string;
   style?: CSSProperties;
   keyWidth?: number | string;
+  itemStyle?: CSSProperties;
   itemRenderer?: (node: ReactNode) => ReactNode;
   titleRenderer?: (title: ReactNode) => ReactNode;
   keyRenderer?: (key: ReactNode) => ReactNode;
@@ -21,6 +22,7 @@ export default function AttributeList(props: AttributeListProps): ReactNode {
     gap,
     style,
     keyWidth = '20%',
+    itemStyle,
     itemRenderer: itemWrapper = (node) => node,
     titleRenderer,
     keyRenderer,
@@ -30,21 +32,13 @@ export default function AttributeList(props: AttributeListProps): ReactNode {
 
   const defaultTitleRenderer = (title: ReactNode) => {
     return (
-      <Typography.Text
-        strong
-        style={{ fontSize: '1em' }}
-      >
-        {title}
-      </Typography.Text>
+      <Typography.Text style={{ fontSize: '1em', fontWeight: 'bold' }}>{title}</Typography.Text>
     );
   };
 
   const defaultKeyRenderer = (key: ReactNode) => {
     return (
-      <Typography.Text
-        strong
-        style={{ fontSize: defaultTextSize }}
-      >
+      <Typography.Text style={{ fontSize: defaultTextSize, fontWeight: 'bold' }}>
         {key}
       </Typography.Text>
     );
@@ -73,12 +67,14 @@ export default function AttributeList(props: AttributeListProps): ReactNode {
         style={style}
         renderItem={(item) => {
           return itemWrapper(
-            <Flex gap={gap}>
+            <Flex
+              gap={gap}
+              style={{ width: '100%', ...itemStyle }}
+            >
               <div
                 style={{
                   margin: 0,
                   padding: 0,
-                  display: 'block',
                   flexBasis: keyWidth,
                   flexShrink: 0,
                   flexGrow: 0,
@@ -91,9 +87,8 @@ export default function AttributeList(props: AttributeListProps): ReactNode {
                 style={{
                   margin: 0,
                   padding: 0,
-                  display: 'block',
-                  flexGrow: 1,
-                  flexBasis: 0,
+                  flex: '1',
+                  width: 0, // for ellipsis to work
                 }}
               >
                 {valueRenderer1(item.value)}

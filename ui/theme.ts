@@ -1,28 +1,55 @@
 import { create } from 'zustand';
-import { GlobalToken, theme } from 'antd';
+import { persist } from 'zustand/middleware';
 
 type ThemeId = 'light' | 'dark';
 
-export function getThemeId(): ThemeId {
-  return useThemeStore.getState().themeId;
+export interface Theme {
+  id: ThemeId;
+  colorBg: string;
+  colorEmpty: string;
 }
 
-export function setThemeId(theme: ThemeId): void {
-  useThemeStore.getState().setTheme(theme);
-}
+const lightTheme: Theme = {
+  id: 'light',
+  colorBg: '#ffffff',
+  colorEmpty: 'rgba(0, 0, 0, 0.25)',
+};
 
-export function useThemeToken(): GlobalToken {
-  return theme.useToken().token;
-}
+const darkTheme: Theme = {
+  id: 'dark',
+  colorBg: '#000000',
+  colorEmpty: 'rgba(255, 255, 255, 0.25)',
+};
 
-interface ThemeState {
+export interface ThemeState {
   themeId: ThemeId;
-  setTheme(theme: ThemeId): void;
+  setTheme(themeId: ThemeId): void;
+  toggleTheme(): void;
 }
 
-const useThemeStore = create<ThemeState>()((set) => ({
-  themeId: 'light',
-  setTheme(theme: ThemeId): void {
-    set({ themeId: theme });
-  },
-}));
+export const useThemeStore = create<ThemeState>()(
+  persist(
+    (set) => ({
+      themeId: 'light',
+      setTheme(themeId: ThemeId): void {
+        set({ themeId: themeId });
+      },
+      toggleTheme(): void {
+        set((state) => ({
+          themeId: state.themeId === 'light' ? 'dark' : 'light',
+        }));
+      },
+    }),
+    {
+      name: 'theme-store',
+    }
+  )
+);
+
+export function isDarkTheme(state: ThemeState): boolean {
+  return state.themeId === 'dark';
+}
+
+export function selectTheme(state: ThemeState): Theme {
+  return state.themeId === 'light' ? lightTheme : darkTheme;
+}

@@ -1,17 +1,19 @@
-import { ReactNode, use, useEffect } from 'react';
-import { Input, Splitter, Flex } from 'antd';
+import { ReactNode, useEffect, useRef } from 'react';
+import { ConfigProvider, Flex, Input, Layout, theme } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import Toolbar from './Toolbar';
-import InvokeList from './InvokeList';
 import InvokeDetail from './InvokeDetail';
+import InvokeList from './InvokeList';
+import Toolbar from './Toolbar';
 import { useInvokeStore } from './store';
-import { useThemeToken } from './theme';
+import { isDarkTheme, selectTheme, useThemeStore } from './theme';
 
 const panelPadding = '24px 28px';
 
 function App(): ReactNode {
-  const themeToken = useThemeToken();
   const invokeStore = useInvokeStore();
+  const isDark = useThemeStore(isDarkTheme);
+  const currentTheme = useThemeStore(selectTheme);
+  const bottomRef = useRef<any>(null);
 
   useEffect(() => {
     (async () => {
@@ -19,48 +21,64 @@ function App(): ReactNode {
     })();
     invokeStore.startPull();
   }, []);
-
   return (
-    <Splitter style={{ height: '100vh' }}>
-      <Splitter.Panel
-        defaultSize="30%"
-        min="20%"
-        max="50%"
-        style={{ padding: panelPadding, backgroundColor: themeToken.colorBgContainer }}
-      >
-        <Flex
-          style={{ height: '100%' }}
-          gap={24}
-          vertical
+    <ConfigProvider
+      theme={{
+        algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        token: {
+          fontSize: 16,
+          borderRadius: 10,
+          colorPrimary: '#9149f7',
+        },
+        components: {
+          Layout: {
+            colorBgLayout: currentTheme.colorBg,
+            siderBg: currentTheme.colorBg,
+          },
+        },
+      }}
+    >
+      <Layout style={{ height: '100vh' }}>
+        <Layout.Sider
+          width="30%"
+          style={{ padding: panelPadding }}
         >
-          <Toolbar />
-          <Input
-            placeholder="Search in invokes"
-            prefix={<SearchOutlined />}
-            allowClear
-            style={{ borderRadius: 16, paddingBlock: 10 }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                const keyword = e.currentTarget.value.trim();
-                invokeStore.setSearchKeyword(keyword);
-              }
-            }}
-            onClear={() => {
-              invokeStore.setSearchKeyword('');
-            }}
-          />
-          <div style={{ flexGrow: 1, overflowY: 'auto', scrollbarWidth: 'thin', padding: 2 }}>
-            <InvokeList />
-          </div>
-        </Flex>
-      </Splitter.Panel>
-      <Splitter.Panel
-        style={{ padding: panelPadding, backgroundColor: themeToken.colorBgContainer }}
-      >
-        <InvokeDetail style={{ width: '100%' }} />
-      </Splitter.Panel>
-    </Splitter>
+          <Flex
+            style={{ height: '100%' }}
+            gap={24}
+            vertical
+          >
+            <Toolbar bottomRef={bottomRef} />
+            <Input
+              placeholder="Search in invokes"
+              prefix={<SearchOutlined />}
+              allowClear
+              style={{ borderRadius: 16, paddingBlock: 10 }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const keyword = e.currentTarget.value.trim();
+                  invokeStore.setSearchKeyword(keyword);
+                }
+              }}
+              onClear={() => {
+                invokeStore.setSearchKeyword('');
+              }}
+            />
+            <div style={{ flexGrow: 1, overflowY: 'auto', scrollbarWidth: 'thin', padding: 2 }}>
+              <InvokeList />
+              <div
+                ref={bottomRef}
+                style={{ height: 0, width: '100%' }}
+              />
+            </div>
+          </Flex>
+        </Layout.Sider>
+        <Layout.Content style={{ padding: panelPadding, maxHeight: '100vh', overflowY: 'auto' }}>
+          <InvokeDetail style={{ width: '100%' }} />
+        </Layout.Content>
+      </Layout>
+    </ConfigProvider>
   );
 }
 

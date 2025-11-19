@@ -1,12 +1,14 @@
-import { ReactNode, CSSProperties } from 'react';
-import { Card, Space, Typography, Button, Flex, Tooltip, Popover, Divider } from 'antd';
-import { CodeOutlined, CopyOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { CSSProperties, ReactNode } from 'react';
+import { Button, Card, Divider, Empty, Flex, Popover, Space, Typography } from 'antd';
+import { CaretDownOutlined } from '@ant-design/icons';
 import AttributeList from './Components/AttributeList';
+import CopyButton from './Components/CopyButton';
+import TextBoardButton from './Components/TextBoardButton';
 import { ChatRequestPanel, ChatResponsePanel } from './InvokePanels/Chat';
-import { useInvokeStore } from './store';
 import { Invoke, getInvokeRequestAsChatRequest, getInvokeResponseAsChatResponse } from './schema';
+import { useInvokeStore } from './store';
+import { selectTheme, useThemeStore } from './theme';
 
 export interface InvokeDetailProps {
   style?: CSSProperties;
@@ -15,9 +17,26 @@ export interface InvokeDetailProps {
 export default function InvokeDetail(props: InvokeDetailProps): ReactNode {
   const { style } = props;
   const store = useInvokeStore();
+  const currentTheme = useThemeStore(selectTheme);
   const invoke = store.invokes.find((inv) => inv.id === store.activitedId);
   if (!invoke) {
-    return <div>No invoke selected</div>;
+    return (
+      <Flex
+        vertical
+        align="center"
+        justify="center"
+        style={{ height: '66%' }}
+      >
+        <Empty
+          image={false}
+          description={false}
+        >
+          <Typography.Text style={{ color: currentTheme.colorEmpty }}>
+            {'Select an Invoke on the left.'}
+          </Typography.Text>
+        </Empty>
+      </Flex>
+    );
   }
   return (
     <Space
@@ -32,10 +51,11 @@ export default function InvokeDetail(props: InvokeDetailProps): ReactNode {
   );
 }
 
+const largeTextSize = '1.2em';
+const smallTextSize = '0.9em';
+
 function InvokeHeader(props: { invoke: Invoke }): ReactNode {
   const { invoke } = props;
-  const largeTextSize = '1.2em';
-  const smallTextSize = '0.8em';
   return (
     <Card>
       <Flex justify="space-between">
@@ -44,42 +64,45 @@ function InvokeHeader(props: { invoke: Invoke }): ReactNode {
             type="secondary"
             style={{ fontSize: largeTextSize }}
           >{`#${invoke.order}`}</Typography.Text>
-          <Typography.Text style={{ fontWeight: 'bolder', fontSize: largeTextSize }}>
+          <Typography.Text style={{ fontSize: largeTextSize, fontWeight: 'bolder' }}>
             {invoke.path}
           </Typography.Text>
-
-          <CopyToClipboard text={invoke.id}>
-            <Button
-              size="small"
-              style={{ fontSize: smallTextSize }}
-            >
-              Copy ID
-            </Button>
-          </CopyToClipboard>
-          <CopyToClipboard text={JSON.stringify(invoke, null, 2)}>
-            <Button
-              size="small"
-              style={{ fontSize: smallTextSize }}
-            >
-              Copy as JSON
-            </Button>
-          </CopyToClipboard>
+          <Typography.Text
+            type="secondary"
+            style={{ fontSize: smallTextSize }}
+          >
+            {`Completed at ${dayjs(invoke.at).format('YYYY-MM-DD HH:mm:ss')}`}
+          </Typography.Text>
+        </Space>
+        <Space>
           <Popover
             trigger="click"
+            placement="bottomRight"
             content={renderInvokeInfo(invoke)}
           >
             <Button
               size="small"
               style={{ fontSize: smallTextSize }}
+              icon={<CaretDownOutlined />}
+              iconPosition="end"
             >
               Headers
             </Button>
           </Popover>
-        </Space>
-        <Space>
-          <Typography.Text type="secondary">
-            {`Completed at ${dayjs(invoke.at).format('YYYY-MM-DD HH:mm:ss')}`}
-          </Typography.Text>
+          <CopyButton
+            size="small"
+            style={{ fontSize: smallTextSize }}
+            copyText={invoke.id}
+          >
+            ID
+          </CopyButton>
+          <TextBoardButton
+            size="small"
+            style={{ fontSize: smallTextSize }}
+            text={JSON.stringify(invoke, null, 2)}
+          >
+            JSON
+          </TextBoardButton>
         </Space>
       </Flex>
     </Card>
