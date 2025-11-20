@@ -5,7 +5,18 @@
   "trailingComma": "es5",
   "printWidth": 100,
   "tabWidth": 2,
-  "importOrder": ["^react$", "^react-", "^@emotion", "antd", "^antd$", "^@ant-design/(.*)$", "^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+  "importOrder": [
+    "^react$",
+    "^react-",
+    "^@emotion",
+    "antd",
+    "^antd$",
+    "^@ant-design/(.*)$",
+    "^@core/(.*)$",
+    "^@server/(.*)$",
+    "^@ui/(.*)$",
+    "^[./]"
+  ],
   "importOrderSeparation": false,
   "importOrderSortSpecifiers": true,
   "plugins": ["@trivago/prettier-plugin-sort-imports"]

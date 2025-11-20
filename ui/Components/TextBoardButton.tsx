@@ -35,11 +35,8 @@ export default function TextBoardButton(props: TextBoardButtonProps): ReactNode 
         <CopyButton
           copyText={text}
           size="small"
-          icon="-"
           style={{ marginBottom: 8, fontSize: smallTextSize }}
-        >
-          Copy
-        </CopyButton>
+        />
         <div style={{ overflow: 'auto', scrollbarWidth: 'thin', width: '100%', height: '60vh' }}>
           <pre
             style={{

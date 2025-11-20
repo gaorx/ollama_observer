@@ -21,9 +21,7 @@ export default function CopyButton(props: CopyButtonProps): ReactNode {
       {contextHolder}
       <CopyToClipboard
         text={copyText}
-        onCopy={() => {
-          messageApi.success('Copied to clipboard');
-        }}
+        onCopy={onCopy}
       >
         <Button
           {...props}

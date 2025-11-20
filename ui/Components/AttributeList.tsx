@@ -12,6 +12,7 @@ export interface AttributeListProps {
   titleRenderer?: (title: ReactNode) => ReactNode;
   keyRenderer?: (key: ReactNode) => ReactNode;
   valueRenderer?: (value: ReactNode) => ReactNode;
+  defaultTitleSize?: string | number;
   defaultTextSize?: string | number;
 }
 
@@ -27,12 +28,15 @@ export default function AttributeList(props: AttributeListProps): ReactNode {
     titleRenderer,
     keyRenderer,
     valueRenderer,
+    defaultTitleSize,
     defaultTextSize,
   } = props;
 
   const defaultTitleRenderer = (title: ReactNode) => {
     return (
-      <Typography.Text style={{ fontSize: '1em', fontWeight: 'bold' }}>{title}</Typography.Text>
+      <Typography.Text style={{ fontSize: defaultTitleSize, fontWeight: 'bold' }}>
+        {title}
+      </Typography.Text>
     );
   };
 
@@ -62,41 +66,43 @@ export default function AttributeList(props: AttributeListProps): ReactNode {
   return (
     <div>
       {title && titleRenderer1(title)}
-      <List
-        dataSource={data}
-        style={style}
-        renderItem={(item) => {
-          return itemWrapper(
-            <Flex
-              gap={gap}
-              style={{ width: '100%', ...itemStyle }}
-            >
-              <div
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  flexBasis: keyWidth,
-                  flexShrink: 0,
-                  flexGrow: 0,
-                  textAlign: 'right',
-                }}
+      {data.length > 0 && (
+        <List
+          dataSource={data}
+          style={style}
+          renderItem={(item) => {
+            return itemWrapper(
+              <Flex
+                gap={gap}
+                style={{ width: '100%', ...itemStyle }}
               >
-                {keyRenderer1(item.key)}
-              </div>
-              <div
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  flex: '1',
-                  width: 0, // for ellipsis to work
-                }}
-              >
-                {valueRenderer1(item.value)}
-              </div>
-            </Flex>
-          );
-        }}
-      />
+                <div
+                  style={{
+                    margin: 0,
+                    padding: 0,
+                    flexBasis: keyWidth,
+                    flexShrink: 0,
+                    flexGrow: 0,
+                    textAlign: 'right',
+                  }}
+                >
+                  {keyRenderer1(item.key)}
+                </div>
+                <div
+                  style={{
+                    margin: 0,
+                    padding: 0,
+                    flex: '1',
+                    width: 0, // for ellipsis to work
+                  }}
+                >
+                  {valueRenderer1(item.value)}
+                </div>
+              </Flex>
+            );
+          }}
+        />
+      )}
     </div>
   );
 }
